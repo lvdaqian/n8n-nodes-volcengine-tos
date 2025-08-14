@@ -57,6 +57,7 @@
     "n8n-workflow": "*"
   },
   "dependencies": {
-    "@volcengine/tos-sdk": "^2.7.5"
+    "@volcengine/tos-sdk": "^2.7.5",
+    "dotenv": "^17.2.1"
   }
 }
