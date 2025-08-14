@@ -1,48 +1,79 @@
-![Banner image](https://user-images.githubusercontent.com/10284570/173569848-c624317f-42b1-45a6-ab09-f0ea3c247648.png)
+# n8n-nodes-volcengine-tos
 
-# n8n-nodes-starter
+This is an n8n community node. It lets you use VolcEngine TOS (Torch Object Storage) in your n8n workflows.
 
-This repo contains example nodes to help you get started building your own custom integrations for [n8n](https://n8n.io). It includes the node linter and other dependencies.
+VolcEngine TOS is a secure, durable, and highly scalable cloud storage service provided by ByteDance's VolcEngine platform. It offers object storage capabilities for storing and retrieving any amount of data from anywhere.
 
-To make your custom node available to the community, you must create it as an npm package, and [submit it to the npm registry](https://docs.npmjs.com/packages-and-modules/contributing-packages-to-the-registry).
+[n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
 
-If you would like your node to be available on n8n cloud you can also [submit your node for verification](https://docs.n8n.io/integrations/creating-nodes/deploy/submit-community-nodes/).
+[Installation](#installation)  
+[Operations](#operations)  
+[Credentials](#credentials)  
+[Compatibility](#compatibility)  
+[Usage](#usage)  
+[Resources](#resources)  
 
-## Prerequisites
+## Installation
 
-You need the following installed on your development machine:
+Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes/installation/) in the n8n community nodes documentation.
 
-* [git](https://git-scm.com/downloads)
-* Node.js and npm. Minimum version Node 20. You can find instructions on how to install both using nvm (Node Version Manager) for Linux, Mac, and WSL [here](https://github.com/nvm-sh/nvm). For Windows users, refer to Microsoft's guide to [Install NodeJS on Windows](https://docs.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-windows).
-* Install n8n with:
-  ```
-  npm install n8n -g
-  ```
-* Recommended: follow n8n's guide to [set up your development environment](https://docs.n8n.io/integrations/creating-nodes/build/node-development-environment/).
+Package name: `n8n-nodes-volcengine-tos`
 
-## Using this starter
+## Operations
 
-These are the basic steps for working with the starter. For detailed guidance on creating and publishing nodes, refer to the [documentation](https://docs.n8n.io/integrations/creating-nodes/).
+The VolcEngine TOS node supports the following operations:
 
-1. [Generate a new repository](https://github.com/n8n-io/n8n-nodes-starter/generate) from this template repository.
-2. Clone your new repo:
-   ```
-   git clone https://github.com/<your organization>/<your-repo-name>.git
-   ```
-3. Run `npm i` to install dependencies.
-4. Open the project in your editor.
-5. Browse the examples in `/nodes` and `/credentials`. Modify the examples, or replace them with your own nodes.
-6. Update the `package.json` to match your details.
-7. Run `npm run lint` to check for errors or `npm run lintfix` to automatically fix errors when possible.
-8. Test your node locally. Refer to [Run your node locally](https://docs.n8n.io/integrations/creating-nodes/test/run-node-locally/) for guidance.
-9. Replace this README with documentation for your node. Use the [README_TEMPLATE](README_TEMPLATE.md) to get started.
-10. Update the LICENSE file to use your details.
-11. [Publish](https://docs.npmjs.com/packages-and-modules/contributing-packages-to-the-registry) your package to npm.
+- **Check Existence**: Check if a file exists in the specified bucket
+- **Upload File**: Upload a file to VolcEngine TOS bucket with optional public access configuration
 
-## More information
+## Credentials
 
-Refer to our [documentation on creating nodes](https://docs.n8n.io/integrations/creating-nodes/) for detailed information on building your own nodes.
+To use this node, you need to set up VolcEngine TOS API credentials:
 
-## License
+### Prerequisites
+1. Sign up for a VolcEngine account at [volcengine.com](https://www.volcengine.com/)
+2. Create a TOS bucket in the VolcEngine console
+3. Generate Access Key ID and Secret Access Key
 
-[MIT](https://github.com/n8n-io/n8n-nodes-starter/blob/master/LICENSE.md)
+### Authentication Setup
+1. In n8n, go to **Credentials** and create new **VolcEngine TOS API** credentials
+2. Fill in the following information:
+   - **Access Key**: Your VolcEngine Access Key ID
+   - **Secret Key**: Your VolcEngine Secret Access Key
+   - **Bucket**: Your TOS bucket name
+   - **Endpoint**: Your TOS service endpoint (e.g., `tos-s3-cn-beijing.volces.com`)
+   - **Region**: Your bucket region (e.g., `cn-beijing`)
+
+## Compatibility
+
+- **Minimum n8n version**: 0.198.0
+- **Node.js version**: >=20.15
+- **Tested with**: n8n 1.x
+
+This node uses the official `@volcengine/tos-sdk` (v2.7.5) for reliable integration with VolcEngine TOS.
+
+## Usage
+
+### Check File Existence
+1. Select "Check Existence" operation
+2. Provide the file path in the bucket
+3. The node will return whether the file exists along with file URL and metadata
+
+### Upload File
+1. Select "Upload File" operation
+2. Specify the target file path in the bucket
+3. Choose the binary property containing the file data
+4. Optionally enable "Make Public" to set public-read ACL
+5. The node will upload the file and return the file URL and upload details
+
+### Error Handling
+The node includes comprehensive error handling and supports n8n's "Continue on Fail" option for robust workflow execution.
+
+## Resources
+
+* [n8n community nodes documentation](https://docs.n8n.io/integrations/#community-nodes)
+* [VolcEngine TOS Documentation](https://www.volcengine.com/docs/6349)
+* [VolcEngine TOS SDK Documentation](https://github.com/volcengine/ve-tos-js-sdk)
+* [Project Repository](https://github.com/lvdaqian/n8n-nodes-volcengine-tos)
+
+
