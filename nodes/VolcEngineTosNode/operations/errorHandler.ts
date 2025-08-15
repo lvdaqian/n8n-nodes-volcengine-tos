@@ -27,6 +27,8 @@ export class TosErrorHandler {
 		// 根据错误类型提供友好的错误信息
 		if (error.message && error.message.includes('No binary data found')) {
 			friendlyMessage = '未找到二进制数据：请确保上游节点提供了文件数据，并检查二进制属性名称是否正确。';
+		} else if (error.code === 'BucketNotEmpty') {
+			friendlyMessage = '存储桶不为空：无法删除包含对象的存储桶。请先删除桶内所有对象。';
 		} else if (error.code === 'NoSuchBucket' || error.message?.includes('bucket')) {
 			friendlyMessage = `存储桶错误：存储桶 "${credentials.bucket || context.bucket}" 不存在或无访问权限。请检查存储桶名称和访问权限配置。`;
 		} else if (error.code === 'InvalidAccessKeyId' || error.message?.includes('AccessKey')) {
@@ -47,8 +49,6 @@ export class TosErrorHandler {
 			friendlyMessage = '文件过大：上传的文件超过了允许的最大大小限制。请使用分片上传或减小文件大小。';
 		} else if (error.code === 'InvalidObjectName') {
 			friendlyMessage = `对象名称无效：文件路径 "${context.filePath}" 包含无效字符。请检查文件路径格式。`;
-		} else if (error.code === 'BucketNotEmpty') {
-			friendlyMessage = '存储桶不为空：无法删除包含对象的存储桶。请先删除桶内所有对象。';
 		} else if (error.code === 'ObjectNotInActiveTierError') {
 			friendlyMessage = '对象未激活：归档或冷归档对象需要先恢复后才能访问。';
 		} else {
