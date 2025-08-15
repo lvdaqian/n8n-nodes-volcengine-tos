@@ -1,4 +1,6 @@
 import { VolcEngineTosNode } from '../../../nodes/VolcEngineTosNode/VolcEngineTosNode.node';
+import { NodeOperationError } from 'n8n-workflow';
+import type { IExecuteFunctions } from 'n8n-workflow';
 
 // Mock the TOS SDK
 jest.mock('@volcengine/tos-sdk', () => {
@@ -10,6 +12,25 @@ jest.mock('@volcengine/tos-sdk', () => {
 				putObjectAcl: jest.fn(),
 			};
 		}),
+	};
+});
+
+// Mock OperationFactory
+jest.mock('../../../nodes/VolcEngineTosNode/operations/OperationFactory', () => {
+	return {
+		OperationFactory: {
+			getOperation: jest.fn(),
+		},
+	};
+});
+
+// Mock TosErrorHandler
+jest.mock('../../../nodes/VolcEngineTosNode/operations/errorHandler', () => {
+	return {
+		TosErrorHandler: {
+				throwNodeError: jest.fn(),
+				createContinueOnFailResult: jest.fn(),
+			},
 	};
 });
 
@@ -115,12 +136,233 @@ describe('VolcEngineTosNode', () => {
 	});
 
 	describe('Execute Function', () => {
+		let mockExecuteFunctions: Partial<IExecuteFunctions>;
+		let mockOperation: any;
+
+		beforeEach(() => {
+			mockOperation = {
+				execute: jest.fn(),
+			};
+
+			mockExecuteFunctions = {
+				getInputData: jest.fn(),
+				getNodeParameter: jest.fn(),
+				getCredentials: jest.fn(),
+				getNode: jest.fn(() => ({
+					id: 'test-node-id',
+					name: 'Test Node',
+					type: 'volcEngineTosNode',
+					typeVersion: 1,
+					position: [0, 0],
+					parameters: {}
+				})),
+				continueOnFail: jest.fn(() => false),
+			};
+
+			// Reset mocks
+			jest.clearAllMocks();
+			
+			// Setup default mocks
+			const { OperationFactory } = require('../../../nodes/VolcEngineTosNode/operations/OperationFactory');
+			OperationFactory.getOperation.mockReturnValue(mockOperation);
+		});
+
 		it('should be defined', () => {
 			expect(node.execute).toBeDefined();
 			expect(typeof node.execute).toBe('function');
 		});
 
-		// Note: More detailed execution tests would require mocking the TOS SDK responses
-		// and testing the actual business logic, which can be added as needed
+		it('should throw error when no credentials are provided', async () => {
+			(mockExecuteFunctions.getInputData as jest.Mock).mockReturnValue([{ json: {} }]);
+			(mockExecuteFunctions.getNodeParameter as jest.Mock).mockReturnValue('checkExistence');
+			(mockExecuteFunctions.getCredentials as jest.Mock).mockResolvedValue(null);
+
+			await expect(node.execute.call(mockExecuteFunctions as IExecuteFunctions))
+				.rejects.toThrow('No credentials returned!');
+		});
+
+		it('should execute operation successfully', async () => {
+			const inputData = [{ json: { test: 'data' } }];
+			const credentials = {
+				accessKey: 'test-key',
+				secretKey: 'test-secret',
+				bucket: 'test-bucket',
+				region: 'us-east-1',
+				endpoint: 'https://tos.example.com'
+			};
+			const operationResult = { success: true, data: 'test-result' };
+
+			(mockExecuteFunctions.getInputData as jest.Mock).mockReturnValue(inputData);
+			(mockExecuteFunctions.getNodeParameter as jest.Mock).mockReturnValue('checkExistence');
+			(mockExecuteFunctions.getCredentials as jest.Mock).mockResolvedValue(credentials);
+			mockOperation.execute.mockResolvedValue(operationResult);
+
+			const result = await node.execute.call(mockExecuteFunctions as IExecuteFunctions);
+
+			expect(result).toHaveLength(1);
+			expect(result[0]).toHaveLength(1);
+			expect(result[0][0]).toEqual({
+				json: operationResult,
+				pairedItem: { item: 0 }
+			});
+		});
+
+		it('should process multiple input items', async () => {
+			const inputData = [
+				{ json: { test: 'data1' } },
+				{ json: { test: 'data2' } }
+			];
+			const credentials = {
+				accessKey: 'test-key',
+				secretKey: 'test-secret',
+				bucket: 'test-bucket',
+				region: 'us-east-1',
+				endpoint: 'https://tos.example.com'
+			};
+
+			(mockExecuteFunctions.getInputData as jest.Mock).mockReturnValue(inputData);
+			(mockExecuteFunctions.getNodeParameter as jest.Mock).mockReturnValue('checkExistence');
+			(mockExecuteFunctions.getCredentials as jest.Mock).mockResolvedValue(credentials);
+			mockOperation.execute.mockResolvedValueOnce({ result: 'item1' })
+				.mockResolvedValueOnce({ result: 'item2' });
+
+			const result = await node.execute.call(mockExecuteFunctions as IExecuteFunctions);
+
+			expect(result).toHaveLength(1);
+			expect(result[0]).toHaveLength(2);
+			expect(result[0][0]).toEqual({
+				json: { result: 'item1' },
+				pairedItem: { item: 0 }
+			});
+			expect(result[0][1]).toEqual({
+				json: { result: 'item2' },
+				pairedItem: { item: 1 }
+			});
+		});
+
+		it('should handle operation errors when continueOnFail is false', async () => {
+			const inputData = [{ json: { test: 'data' } }];
+			const credentials = {
+				accessKey: 'test-key',
+				secretKey: 'test-secret',
+				bucket: 'test-bucket',
+				region: 'us-east-1',
+				endpoint: 'https://tos.example.com'
+			};
+			const error = new Error('Operation failed');
+
+			(mockExecuteFunctions.getInputData as jest.Mock).mockReturnValue(inputData);
+			(mockExecuteFunctions.getNodeParameter as jest.Mock).mockReturnValue('checkExistence');
+			(mockExecuteFunctions.getCredentials as jest.Mock).mockResolvedValue(credentials);
+			(mockExecuteFunctions.continueOnFail as jest.Mock).mockReturnValue(false);
+			mockOperation.execute.mockRejectedValue(error);
+
+			const { TosErrorHandler } = require('../../../nodes/VolcEngineTosNode/operations/errorHandler');
+			TosErrorHandler.throwNodeError.mockImplementation(() => {
+				throw new NodeOperationError(mockExecuteFunctions.getNode!(), 'Mocked error');
+			});
+
+			await expect(node.execute.call(mockExecuteFunctions as IExecuteFunctions))
+				.rejects.toThrow('Mocked error');
+
+			expect(TosErrorHandler.throwNodeError).toHaveBeenCalledWith(
+				mockExecuteFunctions,
+				error,
+				0
+			);
+		});
+
+		it('should handle operation errors when continueOnFail is true', async () => {
+			const inputData = [{ json: { test: 'data' } }];
+			const credentials = {
+				accessKey: 'test-key',
+				secretKey: 'test-secret',
+				bucket: 'test-bucket',
+				region: 'us-east-1',
+				endpoint: 'https://tos.example.com'
+			};
+			const error = new Error('Operation failed');
+			const errorResult = { success: false, error: 'Handled error' };
+
+			(mockExecuteFunctions.getInputData as jest.Mock).mockReturnValue(inputData);
+			(mockExecuteFunctions.getNodeParameter as jest.Mock).mockReturnValue('checkExistence');
+			(mockExecuteFunctions.getCredentials as jest.Mock).mockResolvedValue(credentials);
+			(mockExecuteFunctions.continueOnFail as jest.Mock).mockReturnValue(true);
+			mockOperation.execute.mockRejectedValue(error);
+
+			const { TosErrorHandler } = require('../../../nodes/VolcEngineTosNode/operations/errorHandler');
+			TosErrorHandler.createContinueOnFailResult.mockReturnValue(errorResult);
+
+			const result = await node.execute.call(mockExecuteFunctions as IExecuteFunctions);
+
+			expect(result).toHaveLength(1);
+			expect(result[0]).toHaveLength(1);
+			expect(result[0][0]).toEqual({
+				json: errorResult,
+				pairedItem: { item: 0 }
+			});
+
+			expect(TosErrorHandler.createContinueOnFailResult).toHaveBeenCalledWith(
+				error,
+				'checkExistence',
+				0
+			);
+		});
+
+		it('should initialize TosClient with correct configuration', async () => {
+			const inputData = [{ json: { test: 'data' } }];
+			const credentials = {
+				accessKey: 'test-access-key',
+				secretKey: 'test-secret-key',
+				bucket: 'test-bucket',
+				region: 'cn-north-1',
+				endpoint: 'https://tos-s3-cn-north-1.volces.com'
+			};
+
+			(mockExecuteFunctions.getInputData as jest.Mock).mockReturnValue(inputData);
+			(mockExecuteFunctions.getNodeParameter as jest.Mock).mockReturnValue('checkExistence');
+			(mockExecuteFunctions.getCredentials as jest.Mock).mockResolvedValue(credentials);
+			mockOperation.execute.mockResolvedValue({ success: true });
+
+			await node.execute.call(mockExecuteFunctions as IExecuteFunctions);
+
+			const { TosClient } = require('@volcengine/tos-sdk');
+			expect(TosClient).toHaveBeenCalledWith({
+				accessKeyId: 'test-access-key',
+				accessKeySecret: 'test-secret-key',
+				region: 'cn-north-1',
+				endpoint: 'https://tos-s3-cn-north-1.volces.com'
+			});
+		});
+
+		it('should pass correct credentials to operation executor', async () => {
+			const inputData = [{ json: { test: 'data' } }];
+			const credentials = {
+				accessKey: 'test-access-key',
+				secretKey: 'test-secret-key',
+				bucket: 'test-bucket',
+				region: 'cn-north-1',
+				endpoint: 'https://tos-s3-cn-north-1.volces.com'
+			};
+
+			(mockExecuteFunctions.getInputData as jest.Mock).mockReturnValue(inputData);
+			(mockExecuteFunctions.getNodeParameter as jest.Mock).mockReturnValue('uploadFile');
+			(mockExecuteFunctions.getCredentials as jest.Mock).mockResolvedValue(credentials);
+			mockOperation.execute.mockResolvedValue({ success: true });
+
+			await node.execute.call(mockExecuteFunctions as IExecuteFunctions);
+
+			expect(mockOperation.execute).toHaveBeenCalledWith(
+				expect.any(Object), // TosClient
+				0, // itemIndex
+				{
+					accessKey: 'test-access-key',
+					secretKey: 'test-secret-key',
+					bucket: 'test-bucket',
+					region: 'cn-north-1',
+					endpoint: 'https://tos-s3-cn-north-1.volces.com'
+				}
+			);
+		});
 	});
 });
