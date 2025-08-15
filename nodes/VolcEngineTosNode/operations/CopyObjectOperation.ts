@@ -51,8 +51,8 @@ export class CopyObjectOperation extends BaseOperation {
 			metadataDirective: metadataDirective as any
 		});
 
-		const destinationUrl = `https://${destinationBucket}.${credentials.region}.tos-cn-${credentials.region}.bytedance.net/${destinationKey}`;
-		const sourceUrl = `https://${sourceBucket}.${credentials.region}.tos-cn-${credentials.region}.bytedance.net/${sourceKey}`;
+		const destinationUrl = await super.generatePreSignedUrl(client, destinationBucket, destinationKey, 'GET', 3600);
+		const sourceUrl = await super.generatePreSignedUrl(client, sourceBucket, sourceKey, 'GET', 3600);
 
 		return {
 			copied: true,

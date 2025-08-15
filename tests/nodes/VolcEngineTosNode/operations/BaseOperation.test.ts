@@ -27,8 +27,8 @@ class TestOperation extends BaseOperation {
 	}
 
 	// 公开受保护的方法用于测试
-	public testValidateRequiredParams(params: Record<string, any>, required: string[]) {
-		return this.validateRequiredParams(params, required);
+	public testValidateRequiredParams(executeFunctions: IExecuteFunctions, params: Record<string, any>, required: string[]) {
+		return this.validateRequiredParams(executeFunctions, params, required);
 	}
 
 	public testGetCommonParams(executeFunctions: IExecuteFunctions, itemIndex: number) {
@@ -168,14 +168,14 @@ describe('BaseOperation', () => {
 			const params = { bucket: 'test-bucket', key: 'test-key' };
 			const required = ['bucket', 'key'];
 
-			expect(() => testOperation.testValidateRequiredParams(params, required)).not.toThrow();
+			expect(() => testOperation.testValidateRequiredParams(mockExecuteFunctions as IExecuteFunctions, params, required)).not.toThrow();
 		});
 
 		it('should throw error when required param is missing', () => {
 			const params = { bucket: 'test-bucket' };
 			const required = ['bucket', 'key'];
 
-			expect(() => testOperation.testValidateRequiredParams(params, required))
+			expect(() => testOperation.testValidateRequiredParams(mockExecuteFunctions as IExecuteFunctions, params, required))
 				.toThrow('缺少必需参数: key');
 		});
 
@@ -183,7 +183,7 @@ describe('BaseOperation', () => {
 			const params = { bucket: 'test-bucket', key: '' };
 			const required = ['bucket', 'key'];
 
-			expect(() => testOperation.testValidateRequiredParams(params, required))
+			expect(() => testOperation.testValidateRequiredParams(mockExecuteFunctions as IExecuteFunctions, params, required))
 				.toThrow('缺少必需参数: key');
 		});
 
@@ -191,7 +191,7 @@ describe('BaseOperation', () => {
 			const params = {};
 			const required = ['bucket', 'key'];
 
-			expect(() => testOperation.testValidateRequiredParams(params, required))
+			expect(() => testOperation.testValidateRequiredParams(mockExecuteFunctions as IExecuteFunctions, params, required))
 				.toThrow('缺少必需参数: bucket');
 		});
 	});

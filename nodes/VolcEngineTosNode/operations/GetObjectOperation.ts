@@ -40,7 +40,7 @@ export class GetObjectOperation extends BaseOperation {
 			key: filePath,
 		});
 
-		const fileUrl = `https://${bucket}.${credentials.region}.tos-cn-${credentials.region}.bytedance.net/${filePath}`;
+		const fileUrl = await super.generatePreSignedUrl(client, bucket, filePath, 'GET', 3600);
 
 		const result: any = {
 			downloaded: true,

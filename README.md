@@ -34,6 +34,7 @@ The VolcEngine TOS node supports the following operations:
 - **Delete File**: Delete a file from VolcEngine TOS bucket
 - **Copy File**: Copy a file within VolcEngine TOS (same or different buckets)
 - **List Files**: List files in a VolcEngine TOS bucket with optional prefix filtering
+- **Get Pre-Signed URL**: Generate a pre-signed URL for secure file access with configurable expiration time
 
 ### Bucket Operations
 - **Create Bucket**: Create a new VolcEngine TOS bucket
@@ -96,6 +97,14 @@ This node uses the official `@volcengine/tos-sdk` (v2.7.5) for reliable integrat
 2. Optionally specify a prefix to filter files
 3. Set maximum number of files to return
 4. The node will return a list of files with metadata
+
+### Get Pre-Signed URL
+1. Select "Get Pre-Signed URL" operation
+2. Provide the file path in the bucket
+3. Choose HTTP method (GET for download/view, PUT for upload)
+4. Set expiration time in seconds (default: 1800 = 30 minutes)
+5. Optionally specify version ID, content type, or content disposition
+6. The node will generate a secure pre-signed URL for temporary file access
 
 ### Bucket Management
 - **Create Bucket**: Specify bucket name and optional configuration

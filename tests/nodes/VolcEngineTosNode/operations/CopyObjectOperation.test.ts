@@ -28,7 +28,8 @@ describe('CopyObjectOperation', () => {
 
 		// Mock TosClient
 		mockTosClient = {
-			copyObject: jest.fn()
+			copyObject: jest.fn(),
+			getPreSignedUrl: jest.fn()
 		} as any;
 	});
 
@@ -59,6 +60,11 @@ describe('CopyObjectOperation', () => {
 				}
 			} as any);
 
+			// Mock getPreSignedUrl responses
+			(mockTosClient.getPreSignedUrl as jest.Mock)
+				.mockResolvedValueOnce('https://dest-bucket.cn-north-1.tos-cn-cn-north-1.bytedance.net/dest-file.txt')
+				.mockResolvedValueOnce('https://test-bucket.cn-north-1.tos-cn-cn-north-1.bytedance.net/source-file.txt');
+
 			const credentials = {
 				accessKey: 'test-access-key',
 				secretKey: 'test-secret-key',
@@ -87,7 +93,7 @@ describe('CopyObjectOperation', () => {
 				source: {
 					bucket: 'source-bucket',
 					key: 'source-file.txt',
-					url: 'https://source-bucket.cn-north-1.tos-cn-cn-north-1.bytedance.net/source-file.txt'
+					url: 'https://test-bucket.cn-north-1.tos-cn-cn-north-1.bytedance.net/source-file.txt'
 				},
 				destination: {
 					bucket: 'dest-bucket',

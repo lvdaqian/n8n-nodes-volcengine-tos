@@ -28,7 +28,8 @@ describe('GetObjectOperation', () => {
 
 		// Mock TosClient
 		mockTosClient = {
-			getObject: jest.fn()
+			getObject: jest.fn(),
+			getPreSignedUrl: jest.fn()
 		} as any;
 	});
 
@@ -44,6 +45,9 @@ describe('GetObjectOperation', () => {
 			(mockExecuteFunctions.getNodeParameter as jest.Mock)
 				.mockReturnValueOnce('test-bucket/test-file.txt') // filePath
 				.mockReturnValueOnce(false); // returnBinary
+
+			// Mock getPreSignedUrl
+			mockTosClient.getPreSignedUrl.mockReturnValue('https://test-bucket.tos-cn-north-1.volces.com/test-file.txt?presigned=true');
 
 			// Mock successful getObject response
 			mockTosClient.getObject.mockResolvedValue({
@@ -78,7 +82,7 @@ describe('GetObjectOperation', () => {
 
 			expect(result).toEqual({
 				downloaded: true,
-				url: 'https://test-bucket.cn-north-1.tos-cn-cn-north-1.bytedance.net/test-bucket/test-file.txt',
+				url: 'https://test-bucket.tos-cn-north-1.volces.com/test-file.txt?presigned=true',
 				path: 'test-bucket/test-file.txt',
 				bucket: 'test-bucket',
 				metadata: {
@@ -98,6 +102,9 @@ describe('GetObjectOperation', () => {
 			(mockExecuteFunctions.getNodeParameter as jest.Mock)
 				.mockReturnValueOnce('test-bucket/test-file.txt') // filePath
 				.mockReturnValueOnce(true); // returnBinary
+
+			// Mock getPreSignedUrl
+			mockTosClient.getPreSignedUrl.mockReturnValue('https://test-bucket.tos-cn-north-1.volces.com/test-file.txt?presigned=true');
 
 			// Mock successful getObject response
 			mockTosClient.getObject.mockResolvedValue({

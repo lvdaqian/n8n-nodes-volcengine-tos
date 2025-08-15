@@ -1,4 +1,5 @@
 import type { IExecuteFunctions } from 'n8n-workflow';
+import { NodeOperationError } from 'n8n-workflow';
 import { TosClient } from '@volcengine/tos-sdk';
 import type { IOperationExecutor, IOperationResult } from './types';
 import { TosErrorHandler } from './errorHandler';
@@ -96,7 +97,8 @@ export abstract class BaseOperation implements IOperationExecutor {
 	}
 
 	/**
-	 * 生成文件URL
+	 * 生成文件URL（已废弃，使用getPreSignedUrl替代）
+	 * @deprecated 使用 generatePreSignedUrl 方法替代
 	 */
 	protected generateFileUrl(
 		bucket: string,
@@ -107,12 +109,34 @@ export abstract class BaseOperation implements IOperationExecutor {
 	}
 
 	/**
+	 * 生成预签名URL（推荐使用）
+	 */
+	protected async generatePreSignedUrl(
+		client: TosClient,
+		bucket: string,
+		filePath: string,
+		method: 'GET' | 'PUT' = 'GET',
+		expires: number = 1800
+	): Promise<string> {
+		return await client.getPreSignedUrl({
+			bucket,
+			key: filePath,
+			method,
+			expires
+		});
+	}
+
+	/**
 	 * 验证必需参数
 	 */
-	protected validateRequiredParams(params: Record<string, any>, requiredFields: string[]): void {
+	protected validateRequiredParams(
+		executeFunctions: IExecuteFunctions,
+		params: any,
+		requiredFields: string[]
+	): void {
 		for (const field of requiredFields) {
 			if (!params[field]) {
-				throw new Error(`缺少必需参数: ${field}`);
+				throw new NodeOperationError(executeFunctions.getNode(), `缺少必需参数: ${field}`);
 			}
 		}
 	}

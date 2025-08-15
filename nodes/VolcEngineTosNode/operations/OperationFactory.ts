@@ -8,6 +8,7 @@ import { CopyObjectOperation } from './CopyObjectOperation';
 import { CreateBucketOperation } from './CreateBucketOperation';
 import { DeleteBucketOperation } from './DeleteBucketOperation';
 import { ListBucketsOperation } from './ListBucketsOperation';
+import { GetPreSignedUrlOperation } from './GetPreSignedUrlOperation';
 
 /**
  * 操作工厂类
@@ -27,6 +28,7 @@ export class OperationFactory {
 		this.operations.set('createBucket', new CreateBucketOperation());
 		this.operations.set('deleteBucket', new DeleteBucketOperation());
 		this.operations.set('listBuckets', new ListBucketsOperation());
+		this.operations.set('getPreSignedUrl', new GetPreSignedUrlOperation());
 	}
 
 	/**

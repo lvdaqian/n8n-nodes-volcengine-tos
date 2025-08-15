@@ -40,7 +40,7 @@ export class HeadObjectOperation extends BaseOperation {
 				key: filePath,
 			});
 
-			const fileUrl = `https://${bucket}.${credentials.region}.tos-cn-${credentials.region}.bytedance.net/${filePath}`;
+			const fileUrl = await super.generatePreSignedUrl(client, bucket, filePath, 'GET', 3600);
 
 			return {
 				exists: true, // 如果headObject没有抛出异常，说明文件存在

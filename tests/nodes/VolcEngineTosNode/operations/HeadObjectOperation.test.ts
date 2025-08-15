@@ -28,7 +28,8 @@ describe('HeadObjectOperation', () => {
 
 		// Mock TosClient
 		mockTosClient = {
-			headObject: jest.fn()
+			headObject: jest.fn(),
+			getPreSignedUrl: jest.fn()
 		} as any;
 	});
 
@@ -43,6 +44,9 @@ describe('HeadObjectOperation', () => {
 			// Mock parameters
 			(mockExecuteFunctions.getNodeParameter as jest.Mock)
 				.mockReturnValueOnce('test-bucket/test-file.txt'); // filePath
+
+			// Mock getPreSignedUrl
+			mockTosClient.getPreSignedUrl.mockReturnValue('https://test-bucket.tos-cn-north-1.volces.com/test-file.txt?presigned=true');
 
 			// Mock successful headObject response
 			mockTosClient.headObject.mockResolvedValue({
@@ -84,7 +88,7 @@ describe('HeadObjectOperation', () => {
 				exists: true,
 				path: 'test-bucket/test-file.txt',
 				bucket: 'test-bucket',
-				url: 'https://test-bucket.cn-north-1.tos-cn-cn-north-1.bytedance.net/test-bucket/test-file.txt',
+				url: 'https://test-bucket.tos-cn-north-1.volces.com/test-file.txt?presigned=true',
 				metadata: {
 					contentLength: 1024,
 					contentType: 'text/plain',
@@ -189,6 +193,9 @@ describe('HeadObjectOperation', () => {
 			(mockExecuteFunctions.getNodeParameter as jest.Mock)
 				.mockReturnValueOnce('test-bucket/minimal-file.txt'); // filePath
 
+			// Mock getPreSignedUrl
+			mockTosClient.getPreSignedUrl.mockReturnValue('https://test-bucket.tos-cn-north-1.volces.com/minimal-file.txt?presigned=true');
+
 			// Mock minimal headObject response
 			mockTosClient.headObject.mockResolvedValue({
 				data: {
@@ -219,7 +226,7 @@ describe('HeadObjectOperation', () => {
 				exists: true,
 				path: 'test-bucket/minimal-file.txt',
 				bucket: 'test-bucket',
-				url: 'https://test-bucket.cn-north-1.tos-cn-cn-north-1.bytedance.net/test-bucket/minimal-file.txt',
+				url: 'https://test-bucket.tos-cn-north-1.volces.com/minimal-file.txt?presigned=true',
 				metadata: {
 					contentLength: 512,
 					contentType: 'application/octet-stream',

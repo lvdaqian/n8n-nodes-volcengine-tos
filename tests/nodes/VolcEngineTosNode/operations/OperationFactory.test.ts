@@ -87,7 +87,8 @@ describe('OperationFactory', () => {
 				'copyFile',
 				'createBucket',
 				'deleteBucket',
-				'listBuckets'
+				'listBuckets',
+				'getPreSignedUrl'
 			];
 
 			expect(supportedOperations).toHaveLength(expectedOperations.length);

@@ -30,7 +30,8 @@ describe('PutObjectOperation', () => {
 		// Mock TosClient
 		mockTosClient = {
 			putObject: jest.fn(),
-			putObjectAcl: jest.fn()
+			putObjectAcl: jest.fn(),
+			getPreSignedUrl: jest.fn()
 		} as any;
 	});
 
@@ -68,6 +69,10 @@ describe('PutObjectOperation', () => {
 					versionId: 'version123'
 				}
 			} as any);
+
+			(mockTosClient.getPreSignedUrl as jest.Mock).mockResolvedValue(
+				'https://test-bucket.cn-north-1.tos-cn-cn-north-1.bytedance.net/test-bucket/test-file.txt'
+			);
 
 			const credentials = {
 				accessKey: 'test-access-key',
@@ -133,6 +138,10 @@ describe('PutObjectOperation', () => {
 			} as any);
 
 			mockTosClient.putObjectAcl.mockResolvedValue({} as any);
+
+			(mockTosClient.getPreSignedUrl as jest.Mock).mockResolvedValue(
+				'https://test-bucket.cn-north-1.tos-cn-cn-north-1.bytedance.net/test-bucket/public-file.txt'
+			);
 
 			const credentials = {
 				accessKey: 'test-access-key',
