@@ -1,4 +1,4 @@
-import type { IExecuteFunctions, INodeExecutionData } from 'n8n-workflow';
+import type { IExecuteFunctions } from 'n8n-workflow';
 import { TosClient } from '@volcengine/tos-sdk';
 
 // 基础操作接口
