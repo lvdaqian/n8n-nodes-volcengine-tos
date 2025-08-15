@@ -239,6 +239,293 @@ describe('VolcEngineTosNode Integration Tests', () => {
 				}
 			}, 20000);
 		});
+
+		describeOrSkip('Download File Operation', () => {
+			it('should download an uploaded file successfully', async () => {
+				// 首先上传一个文件
+				const downloadTestFile = `${testFilePrefix}download-test-${Date.now()}.txt`;
+				const testContent = 'Content for download test';
+				const testBuffer = Buffer.from(testContent, 'utf8');
+				
+				// 上传文件
+				(mockExecuteFunctions.getInputData as jest.Mock).mockReturnValue([
+					{ 
+						json: { test: 'upload-for-download' },
+						binary: {
+							data: {
+								data: testBuffer.toString('base64'),
+								mimeType: 'text/plain',
+								fileName: 'download-test.txt'
+							}
+						}
+					}
+				]);
+				(mockExecuteFunctions.getNodeParameter as jest.Mock)
+					.mockReturnValueOnce('uploadFile')
+					.mockReturnValueOnce(downloadTestFile)
+					.mockReturnValueOnce('data')
+					.mockReturnValueOnce(false);
+				(mockExecuteFunctions.getCredentials as jest.Mock).mockResolvedValue(testConfig);
+
+				await node.execute.call(mockExecuteFunctions as IExecuteFunctions);
+				
+				// 然后下载文件
+				(mockExecuteFunctions.getNodeParameter as jest.Mock).mockClear();
+				(mockExecuteFunctions.getNodeParameter as jest.Mock)
+					.mockReturnValueOnce('downloadFile')
+					.mockReturnValueOnce(downloadTestFile);
+				
+				try {
+					const result = await node.execute.call(mockExecuteFunctions as IExecuteFunctions);
+					
+					expect(result).toBeDefined();
+					expect(Array.isArray(result)).toBe(true);
+					expect(result.length).toBeGreaterThan(0);
+					
+					const downloadData = result[0][0];
+					expect(downloadData.json).toHaveProperty('downloaded', true);
+					expect(downloadData.json).toHaveProperty('path', downloadTestFile);
+					expect(downloadData.binary).toBeDefined();
+					
+					console.log('✅ 文件下载成功:', downloadData.json.path);
+					
+				} catch (error: any) {
+					console.error('❌ 文件下载失败:', error.message);
+					throw error;
+				}
+			}, 30000);
+		});
+
+		describeOrSkip('List Files Operation', () => {
+			it('should list files in bucket successfully', async () => {
+				(mockExecuteFunctions.getInputData as jest.Mock).mockReturnValue([
+					{ json: { test: 'list-files' } }
+				]);
+				(mockExecuteFunctions.getNodeParameter as jest.Mock)
+					.mockReturnValueOnce('listFiles') // operation
+					.mockReturnValueOnce('') // prefix
+					.mockReturnValueOnce(10) // maxKeys
+					.mockReturnValueOnce(''); // delimiter
+				(mockExecuteFunctions.getCredentials as jest.Mock).mockResolvedValue(testConfig);
+
+				try {
+					const result = await node.execute.call(mockExecuteFunctions as IExecuteFunctions);
+					
+					expect(result).toBeDefined();
+					expect(Array.isArray(result)).toBe(true);
+					expect(result.length).toBeGreaterThan(0);
+					
+					const listData = result[0][0].json as any;
+					expect(listData).toHaveProperty('files');
+					expect(Array.isArray(listData.files)).toBe(true);
+					expect(listData).toHaveProperty('totalCount');
+					
+					console.log(`✅ 文件列表获取成功，共 ${listData.totalCount} 个文件`);
+					
+				} catch (error: any) {
+					console.error('❌ 文件列表获取失败:', error.message);
+					throw error;
+				}
+			}, 15000);
+		});
+
+		describeOrSkip('Copy File Operation', () => {
+			it('should copy a file successfully', async () => {
+				// 首先上传一个源文件
+				const sourceFile = `${testFilePrefix}copy-source-${Date.now()}.txt`;
+				const destFile = `${testFilePrefix}copy-dest-${Date.now()}.txt`;
+				const testBuffer = Buffer.from('Content for copy test', 'utf8');
+				
+				// 上传源文件
+				(mockExecuteFunctions.getInputData as jest.Mock).mockReturnValue([
+					{ 
+						json: { test: 'upload-for-copy' },
+						binary: {
+							data: {
+								data: testBuffer.toString('base64'),
+								mimeType: 'text/plain',
+								fileName: 'copy-source.txt'
+							}
+						}
+					}
+				]);
+				(mockExecuteFunctions.getNodeParameter as jest.Mock)
+					.mockReturnValueOnce('uploadFile')
+					.mockReturnValueOnce(sourceFile)
+					.mockReturnValueOnce('data')
+					.mockReturnValueOnce(false);
+				(mockExecuteFunctions.getCredentials as jest.Mock).mockResolvedValue(testConfig);
+
+				await node.execute.call(mockExecuteFunctions as IExecuteFunctions);
+				
+				// 然后复制文件
+				(mockExecuteFunctions.getNodeParameter as jest.Mock).mockClear();
+				(mockExecuteFunctions.getNodeParameter as jest.Mock)
+					.mockReturnValueOnce('copyFile')
+					.mockReturnValueOnce(sourceFile)
+					.mockReturnValueOnce(destFile);
+				
+				try {
+					const result = await node.execute.call(mockExecuteFunctions as IExecuteFunctions);
+					
+					expect(result).toBeDefined();
+					expect(Array.isArray(result)).toBe(true);
+					expect(result.length).toBeGreaterThan(0);
+					
+					const copyData = result[0][0].json as any;
+					expect(copyData).toHaveProperty('copied', true);
+					expect(copyData).toHaveProperty('sourcePath', sourceFile);
+					expect(copyData).toHaveProperty('destinationPath', destFile);
+					
+					console.log('✅ 文件复制成功:', `${sourceFile} -> ${destFile}`);
+					
+				} catch (error: any) {
+					console.error('❌ 文件复制失败:', error.message);
+					throw error;
+				}
+			}, 30000);
+		});
+
+		describeOrSkip('Delete File Operation', () => {
+			it('should delete a file successfully', async () => {
+				// 首先上传一个文件用于删除
+				const deleteTestFile = `${testFilePrefix}delete-test-${Date.now()}.txt`;
+				const testBuffer = Buffer.from('Content for delete test', 'utf8');
+				
+				// 上传文件
+				(mockExecuteFunctions.getInputData as jest.Mock).mockReturnValue([
+					{ 
+						json: { test: 'upload-for-delete' },
+						binary: {
+							data: {
+								data: testBuffer.toString('base64'),
+								mimeType: 'text/plain',
+								fileName: 'delete-test.txt'
+							}
+						}
+					}
+				]);
+				(mockExecuteFunctions.getNodeParameter as jest.Mock)
+					.mockReturnValueOnce('uploadFile')
+					.mockReturnValueOnce(deleteTestFile)
+					.mockReturnValueOnce('data')
+					.mockReturnValueOnce(false);
+				(mockExecuteFunctions.getCredentials as jest.Mock).mockResolvedValue(testConfig);
+
+				await node.execute.call(mockExecuteFunctions as IExecuteFunctions);
+				
+				// 然后删除文件
+				(mockExecuteFunctions.getNodeParameter as jest.Mock).mockClear();
+				(mockExecuteFunctions.getNodeParameter as jest.Mock)
+					.mockReturnValueOnce('deleteFile')
+					.mockReturnValueOnce(deleteTestFile);
+				
+				try {
+					const result = await node.execute.call(mockExecuteFunctions as IExecuteFunctions);
+					
+					expect(result).toBeDefined();
+					expect(Array.isArray(result)).toBe(true);
+					expect(result.length).toBeGreaterThan(0);
+					
+					const deleteData = result[0][0].json as any;
+					expect(deleteData).toHaveProperty('deleted', true);
+					expect(deleteData).toHaveProperty('path', deleteTestFile);
+					
+					console.log('✅ 文件删除成功:', deleteTestFile);
+					
+				} catch (error: any) {
+					console.error('❌ 文件删除失败:', error.message);
+					throw error;
+				}
+			}, 30000);
+		});
+
+		describeOrSkip('Get File Metadata Operation', () => {
+			it('should get file metadata successfully', async () => {
+				// 首先上传一个文件
+				const metadataTestFile = `${testFilePrefix}metadata-test-${Date.now()}.txt`;
+				const testBuffer = Buffer.from('Content for metadata test', 'utf8');
+				
+				// 上传文件
+				(mockExecuteFunctions.getInputData as jest.Mock).mockReturnValue([
+					{ 
+						json: { test: 'upload-for-metadata' },
+						binary: {
+							data: {
+								data: testBuffer.toString('base64'),
+								mimeType: 'text/plain',
+								fileName: 'metadata-test.txt'
+							}
+						}
+					}
+				]);
+				(mockExecuteFunctions.getNodeParameter as jest.Mock)
+					.mockReturnValueOnce('uploadFile')
+					.mockReturnValueOnce(metadataTestFile)
+					.mockReturnValueOnce('data')
+					.mockReturnValueOnce(false);
+				(mockExecuteFunctions.getCredentials as jest.Mock).mockResolvedValue(testConfig);
+
+				await node.execute.call(mockExecuteFunctions as IExecuteFunctions);
+				
+				// 然后获取文件元数据
+				(mockExecuteFunctions.getNodeParameter as jest.Mock).mockClear();
+				(mockExecuteFunctions.getNodeParameter as jest.Mock)
+					.mockReturnValueOnce('checkExistence')
+					.mockReturnValueOnce(metadataTestFile);
+				
+				try {
+					const result = await node.execute.call(mockExecuteFunctions as IExecuteFunctions);
+					
+					expect(result).toBeDefined();
+					expect(Array.isArray(result)).toBe(true);
+					expect(result.length).toBeGreaterThan(0);
+					
+					const metadataData = result[0][0].json as any;
+					expect(metadataData).toHaveProperty('exists', true);
+					expect(metadataData).toHaveProperty('path', metadataTestFile);
+					expect(metadataData).toHaveProperty('metadata');
+					expect(metadataData.metadata).toHaveProperty('etag');
+					expect(metadataData).toHaveProperty('url');
+					
+					console.log('✅ 文件元数据获取成功:', metadataData.path);
+					
+				} catch (error: any) {
+					console.error('❌ 文件元数据获取失败:', error.message);
+					throw error;
+				}
+			}, 30000);
+		});
+
+		describeOrSkip('Bucket Operations', () => {
+			it('should list buckets successfully', async () => {
+				(mockExecuteFunctions.getInputData as jest.Mock).mockReturnValue([
+					{ json: { test: 'list-buckets' } }
+				]);
+				(mockExecuteFunctions.getNodeParameter as jest.Mock)
+					.mockReturnValueOnce('listBuckets'); // operation
+				(mockExecuteFunctions.getCredentials as jest.Mock).mockResolvedValue(testConfig);
+
+				try {
+					const result = await node.execute.call(mockExecuteFunctions as IExecuteFunctions);
+					
+					expect(result).toBeDefined();
+					expect(Array.isArray(result)).toBe(true);
+					expect(result.length).toBeGreaterThan(0);
+					
+					const bucketsData = result[0][0].json as any;
+					expect(bucketsData).toHaveProperty('buckets');
+					expect(Array.isArray(bucketsData.buckets)).toBe(true);
+					expect(bucketsData).toHaveProperty('count');
+					
+					console.log(`✅ 存储桶列表获取成功，共 ${bucketsData.count} 个存储桶`);
+					
+				} catch (error: any) {
+					console.error('❌ 存储桶列表获取失败:', error.message);
+					throw error;
+				}
+			}, 15000);
+		});
 	});
 
 	// 性能测试

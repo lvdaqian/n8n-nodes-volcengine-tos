@@ -1,5 +1,9 @@
 # n8n-nodes-volcengine-tos
 
+English | [中文](./README_CN.md)
+
+> 🚀 **Built with [Trae IDE](https://trae.ai) Vibe Coding** - Welcome to use and submit [Issues](https://github.com/lvdaqian/n8n-nodes-volcengine-tos/issues)!
+
 This is an n8n community node. It lets you use VolcEngine TOS (Torch Object Storage) in your n8n workflows.
 
 VolcEngine TOS is a secure, durable, and highly scalable cloud storage service provided by ByteDance's VolcEngine platform. It offers object storage capabilities for storing and retrieving any amount of data from anywhere.
@@ -23,8 +27,18 @@ Package name: `n8n-nodes-volcengine-tos`
 
 The VolcEngine TOS node supports the following operations:
 
-- **Check Existence**: Check if a file exists in the specified bucket
-- **Upload File**: Upload a file to VolcEngine TOS bucket with optional public access configuration
+### File Operations
+- **Check File Existence**: Check if a file exists in the specified bucket and get its metadata
+- **Upload File**: Upload a binary file to VolcEngine TOS bucket with optional public access configuration
+- **Download File**: Download a file from VolcEngine TOS bucket
+- **Delete File**: Delete a file from VolcEngine TOS bucket
+- **Copy File**: Copy a file within VolcEngine TOS (same or different buckets)
+- **List Files**: List files in a VolcEngine TOS bucket with optional prefix filtering
+
+### Bucket Operations
+- **Create Bucket**: Create a new VolcEngine TOS bucket
+- **Delete Bucket**: Delete an existing VolcEngine TOS bucket
+- **List Buckets**: List all available VolcEngine TOS buckets
 
 ## Credentials
 
@@ -66,8 +80,75 @@ This node uses the official `@volcengine/tos-sdk` (v2.7.5) for reliable integrat
 4. Optionally enable "Make Public" to set public-read ACL
 5. The node will upload the file and return the file URL and upload details
 
+### Download File
+1. Select "Download File" operation
+2. Provide the file path in the bucket
+3. The node will download the file and return it as binary data
+
+### Copy File
+1. Select "Copy File" operation
+2. Specify the source file path
+3. Specify the destination file path
+4. The node will copy the file and return operation details
+
+### List Files
+1. Select "List Files" operation
+2. Optionally specify a prefix to filter files
+3. Set maximum number of files to return
+4. The node will return a list of files with metadata
+
+### Bucket Management
+- **Create Bucket**: Specify bucket name and optional configuration
+- **Delete Bucket**: Specify bucket name to delete
+- **List Buckets**: Get all available buckets with metadata
+
 ### Error Handling
-The node includes comprehensive error handling and supports n8n's "Continue on Fail" option for robust workflow execution.
+The node includes comprehensive error handling with user-friendly error messages and supports n8n's "Continue on Fail" option for robust workflow execution.
+
+## Testing
+
+### Unit Tests
+The project includes comprehensive unit tests for all operations:
+
+```bash
+# Run all unit tests (excludes integration tests)
+npm test -- --testPathIgnorePatterns=".*\.integration\.test\.ts$"
+
+# Run specific operation tests
+npm test -- --testPathPattern="ListBucketsOperation\.test\.ts$"
+```
+
+**Test Coverage**: 12 test suites, 80 unit tests covering all operations and error scenarios.
+
+### Integration Tests
+Integration tests require real VolcEngine TOS credentials:
+
+```bash
+# Set up environment variables
+export VOLCENGINE_ACCESS_KEY="your-access-key"
+export VOLCENGINE_SECRET_KEY="your-secret-key"
+export VOLCENGINE_BUCKET="your-test-bucket"
+export VOLCENGINE_REGION="cn-north-1"  # optional
+export VOLCENGINE_ENDPOINT=""  # optional
+
+# Run integration tests
+npm test -- --testPathPattern="VolcEngineTosNode\.integration\.test\.ts$"
+
+# Run all tests (unit + integration)
+npm test
+```
+
+**Note**: Integration tests will fail without valid credentials, but unit tests ensure code quality and functionality.
+
+## Architecture
+
+The project follows a modular architecture:
+
+- **Modular Operations**: Each TOS operation is implemented as a separate class
+- **Factory Pattern**: `OperationFactory` manages operation instantiation
+- **Centralized Error Handling**: `TosErrorHandler` provides consistent error management
+- **Type Safety**: Full TypeScript implementation with proper interfaces
+- **Base Operation**: Abstract `BaseOperation` class for common functionality
 
 ## Resources
 
