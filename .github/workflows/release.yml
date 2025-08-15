@@ -49,8 +49,15 @@ jobs:
           # Extract version from release tag (remove 'v' prefix if present)
           VERSION=${GITHUB_REF#refs/tags/}
           VERSION=${VERSION#v}
-          echo "Updating package.json version to $VERSION"
-          npm version $VERSION --no-git-tag-version
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          echo "Current version: $CURRENT_VERSION"
+          echo "Target version: $VERSION"
+          if [ "$CURRENT_VERSION" != "$VERSION" ]; then
+            echo "Updating package.json version to $VERSION"
+            npm version $VERSION --no-git-tag-version
+          else
+            echo "Version is already $VERSION, skipping update"
+          fi
           
       - name: Publish to NPM
         if: matrix.node-version == '20.x'
