@@ -1,10 +1,25 @@
 # n8n-nodes-volcengine-tos
 
+[![npm version](https://badge.fury.io/js/n8n-nodes-volcengine-tos.svg)](https://badge.fury.io/js/n8n-nodes-volcengine-tos)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Test Coverage](https://img.shields.io/badge/coverage-94.77%25-brightgreen.svg)]()
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D20.15-brightgreen.svg)]()
+[![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue.svg)]()
+
 English | [中文](./README_CN.md)
 
 > 🚀 **Built with [Trae IDE](https://trae.ai) Vibe Coding** - Welcome to use and submit [Issues](https://github.com/lvdaqian/n8n-nodes-volcengine-tos/issues)!
 
-This is an n8n community node. It lets you use VolcEngine TOS (Torch Object Storage) in your n8n workflows.
+## ✨ Features
+
+- 🔥 **10+ Operations**: Complete VolcEngine TOS automation with file and bucket management
+- 🔐 **Pre-signed URLs**: Secure file access with configurable expiration times
+- 🧪 **High Quality**: 94.77% test coverage with 139 unit tests
+- 🌐 **Bilingual**: Full English and Chinese documentation
+- ⚡ **Type Safe**: Built with TypeScript for better development experience
+- 📦 **Easy Setup**: Zero configuration, works out of the box
+
+This is an n8n community node that lets you use VolcEngine TOS (Torch Object Storage) in your n8n workflows.
 
 VolcEngine TOS is a secure, durable, and highly scalable cloud storage service provided by ByteDance's VolcEngine platform. It offers object storage capabilities for storing and retrieving any amount of data from anywhere.
 

@@ -1,10 +1,25 @@
 # n8n-nodes-volcengine-tos
 
+[![npm version](https://badge.fury.io/js/n8n-nodes-volcengine-tos.svg)](https://badge.fury.io/js/n8n-nodes-volcengine-tos)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Test Coverage](https://img.shields.io/badge/coverage-94.77%25-brightgreen.svg)]()
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D20.15-brightgreen.svg)]()
+[![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue.svg)]()
+
 [English](./README.md) | 中文
 
 > 🚀 **本项目通过 [Trae IDE](https://trae.ai) 氛围编程构建** - 欢迎大家使用并提交 [Issue](https://github.com/lvdaqian/n8n-nodes-volcengine-tos/issues)！
 
-这是一个 n8n 社区节点。它让您可以在 n8n 工作流中使用火山引擎 TOS（对象存储服务）。
+## ✨ 特性
+
+- 🔥 **10+ 操作**: 完整的火山引擎 TOS 自动化，支持文件和存储桶管理
+- 🔐 **预签名 URL**: 安全的文件访问，支持可配置的过期时间
+- 🧪 **高质量**: 94.77% 测试覆盖率，139 个单元测试
+- 🌐 **双语支持**: 完整的中英文文档
+- ⚡ **类型安全**: 使用 TypeScript 构建，提供更好的开发体验
+- 📦 **简单设置**: 零配置，开箱即用
+
+这是一个 n8n 社区节点，让您可以在 n8n 工作流中使用火山引擎 TOS（对象存储服务）。
 
 火山引擎 TOS 是由字节跳动火山引擎平台提供的安全、持久且高度可扩展的云存储服务。它提供对象存储功能，可以从任何地方存储和检索任意数量的数据。
 

@@ -1,12 +1,25 @@
 {
   "name": "n8n-nodes-volcengine-tos",
   "version": "0.1.0",
-  "description": "n8n community nodes for volcengine tos",
+  "description": "n8n community nodes for VolcEngine TOS (Object Storage) - Upload, download, manage files and buckets with pre-signed URLs support",
   "keywords": [
-    "n8n-community-node-package"
+    "n8n-community-node-package",
+    "n8n",
+    "volcengine",
+    "tos",
+    "object-storage",
+    "cloud-storage",
+    "file-upload",
+    "file-download",
+    "automation",
+    "workflow",
+    "bytedance",
+    "presigned-url",
+    "bucket-management",
+    "typescript"
   ],
   "license": "MIT",
-  "homepage": "",
+  "homepage": "https://github.com/lvdaqian/n8n-nodes-volcengine-tos#readme",
   "author": {
     "name": "lvdaqian",
     "email": "lvdaqian@bytedance.com"
