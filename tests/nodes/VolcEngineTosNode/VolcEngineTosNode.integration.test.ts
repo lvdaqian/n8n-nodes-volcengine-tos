@@ -252,18 +252,18 @@ describe('VolcEngineTosNode Integration Tests', () => {
 					{ 
 						json: { test: 'upload-for-download' },
 						binary: {
-							data: {
-								data: testBuffer.toString('base64'),
-								mimeType: 'text/plain',
-								fileName: 'download-test.txt'
-							}
+						'download-test.txt': {
+							data: testBuffer.toString('base64'),
+							mimeType: 'text/plain',
+							fileName: 'download-test.txt'
 						}
+					}
 					}
 				]);
 				(mockExecuteFunctions.getNodeParameter as jest.Mock)
 					.mockReturnValueOnce('uploadFile')
 					.mockReturnValueOnce(downloadTestFile)
-					.mockReturnValueOnce('data')
+					.mockReturnValueOnce('download-test.txt')
 					.mockReturnValueOnce(false);
 				(mockExecuteFunctions.getCredentials as jest.Mock).mockResolvedValue(testConfig);
 
@@ -296,14 +296,21 @@ describe('VolcEngineTosNode Integration Tests', () => {
 					
 					// 验证binary数据现在应该在正确的位置
 					expect(downloadData.binary).toBeDefined();
-					if (downloadData.binary && downloadData.binary.data) {
-						expect(downloadData.binary.data).toBeDefined();
-						expect(typeof downloadData.binary.data.data).toBe('string');
-						expect(downloadData.binary.data.mimeType).toBeDefined();
-						expect(downloadData.binary.data.fileName).toBeDefined();
+					if (downloadData.binary) {
+						// 获取binary数据的动态key（文件名）
+						const binaryKeys = Object.keys(downloadData.binary);
+						expect(binaryKeys.length).toBeGreaterThan(0);
+						
+						const binaryKey = binaryKeys[0];
+						const binaryData = downloadData.binary[binaryKey];
+						
+						expect(binaryData).toBeDefined();
+						expect(typeof binaryData.data).toBe('string');
+						expect(binaryData.mimeType).toBeDefined();
+						expect(binaryData.fileName).toBeDefined();
 						
 						// 验证下载的内容（从base64解码）
-						const downloadedContent = Buffer.from(downloadData.binary.data.data as unknown as string, 'base64').toString();
+						const downloadedContent = Buffer.from(binaryData.data as string, 'base64').toString();
 						expect(downloadedContent).toBe(testContent);
 					}
 					

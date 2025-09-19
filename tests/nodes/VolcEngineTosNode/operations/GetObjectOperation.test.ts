@@ -141,12 +141,12 @@ describe('GetObjectOperation', () => {
 			expect(result.json.fileName).toBe('test-file.txt');
 			
 			expect(result.binary).toBeDefined();
-			expect(result.binary.data).toBeDefined();
-			expect(typeof result.binary.data.data).toBe('string');
-			expect(result.binary.data.mimeType).toBe('text/plain');
-			expect(result.binary.data.fileName).toBe('test-file.txt');
+			expect(result.binary['test-file.txt']).toBeDefined();
+			expect(typeof result.binary['test-file.txt'].data).toBe('string');
+			expect(result.binary['test-file.txt'].mimeType).toBe('text/plain');
+			expect(result.binary['test-file.txt'].fileName).toBe('test-file.txt');
 			// 验证base64编码的内容
-			expect(Buffer.from(result.binary.data.data, 'base64').toString()).toBe('file content');
+			expect(Buffer.from(result.binary['test-file.txt'].data, 'base64').toString()).toBe('file content');
 		});
 
 		it('should throw error for getObject failures', async () => {
