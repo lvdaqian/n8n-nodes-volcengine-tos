@@ -209,6 +209,54 @@ export class VolcEngineTosNode implements INodeType {
           },
           default: '',
           description: 'Override the Content-Disposition header in the response (optional)',
+        },
+        {
+          displayName: 'Prefix Filter',
+          name: 'prefix',
+          type: 'string',
+          displayOptions: {
+            show: {
+              operation: ['listFiles'],
+            },
+          },
+          default: '',
+          description: 'Filter files by prefix (optional)',
+        },
+        {
+          displayName: 'Maximum Number',
+          name: 'maxKeys',
+          type: 'number',
+          displayOptions: {
+            show: {
+              operation: ['listFiles'],
+            },
+          },
+          default: 1000,
+          description: 'Maximum number of files to return (default: 1000)',
+        },
+        {
+          displayName: 'Delimiter',
+          name: 'delimiter',
+          type: 'string',
+          displayOptions: {
+            show: {
+              operation: ['listFiles'],
+            },
+          },
+          default: '',
+          description: 'Delimiter for grouping files (optional)',
+        },
+        {
+          displayName: 'Marker',
+          name: 'marker',
+          type: 'string',
+          displayOptions: {
+            show: {
+              operation: ['listFiles'],
+            },
+          },
+          default: '',
+          description: 'Start listing from this marker (for pagination, optional)',
         }
 		],
 	};

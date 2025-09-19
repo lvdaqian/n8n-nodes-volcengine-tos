@@ -59,14 +59,19 @@ export class ListObjectsOperation extends BaseOperation {
 		const commonPrefixes = response.data?.CommonPrefixes?.map((cp: any) => cp.Prefix) || [];
 
 		return {
-			objects,
-			commonPrefixes,
+			files: objects,
+			folders: commonPrefixes,
 			bucket,
 			prefix: prefix || '',
 			marker: response.data?.Marker || '',
 			nextMarker: response.data?.NextMarker || '',
 			maxKeys,
 			isTruncated: response.data?.IsTruncated || false,
+			totalFiles: objects.length,
+			totalFolders: commonPrefixes.length,
+			// Keep backward compatibility
+			objects,
+			commonPrefixes,
 			count: objects.length
 		};
 	}

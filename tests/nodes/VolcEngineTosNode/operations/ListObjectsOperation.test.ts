@@ -103,40 +103,48 @@ describe('ListObjectsOperation', () => {
 				maxKeys: 1000
 			});
 
-			expect(result).toEqual({
-				objects: [
-					{
-						key: 'folder/file1.txt',
-						lastModified: new Date('2023-01-01T00:00:00Z'),
-						etag: '"abc123"',
-						size: 1024,
-						storageClass: 'STANDARD',
-						owner: {
-							id: 'owner123',
-							displayName: 'Test Owner'
-						},
-						url: 'https://test-bucket.cn-north-1.tos-cn-cn-north-1.bytedance.net/folder/file1.txt'
+			const expectedFiles = [
+				{
+					key: 'folder/file1.txt',
+					lastModified: new Date('2023-01-01T00:00:00Z'),
+					etag: '"abc123"',
+					size: 1024,
+					storageClass: 'STANDARD',
+					owner: {
+						id: 'owner123',
+						displayName: 'Test Owner'
 					},
-					{
-						key: 'folder/file2.txt',
-						lastModified: new Date('2023-01-02T00:00:00Z'),
-						etag: '"def456"',
-						size: 2048,
-						storageClass: 'STANDARD',
-						owner: {
-							id: 'owner456',
-							displayName: 'Test Owner 2'
-						},
-						url: 'https://test-bucket.cn-north-1.tos-cn-cn-north-1.bytedance.net/folder/file2.txt'
-					}
-				],
-				commonPrefixes: ['images/', 'documents/'],
+					url: 'https://test-bucket.cn-north-1.tos-cn-cn-north-1.bytedance.net/folder/file1.txt'
+				},
+				{
+					key: 'folder/file2.txt',
+					lastModified: new Date('2023-01-02T00:00:00Z'),
+					etag: '"def456"',
+					size: 2048,
+					storageClass: 'STANDARD',
+					owner: {
+						id: 'owner456',
+						displayName: 'Test Owner 2'
+					},
+					url: 'https://test-bucket.cn-north-1.tos-cn-cn-north-1.bytedance.net/folder/file2.txt'
+				}
+			];
+			const expectedFolders = ['images/', 'documents/'];
+
+			expect(result).toEqual({
+				files: expectedFiles,
+				folders: expectedFolders,
 				bucket: 'test-bucket',
 				prefix: '',
 				marker: '',
 				nextMarker: '',
 				maxKeys: 1000,
 				isTruncated: false,
+				totalFiles: 2,
+				totalFolders: 2,
+				// Backward compatibility
+				objects: expectedFiles,
+				commonPrefixes: expectedFolders,
 				count: 2
 			});
 		});
@@ -188,6 +196,9 @@ describe('ListObjectsOperation', () => {
 				maxKeys: 100
 			});
 
+			expect(result.files).toHaveLength(1);
+			expect(result.files[0].key).toBe('images/photo1.jpg');
+			// Test backward compatibility
 			expect(result.objects).toHaveLength(1);
 			expect(result.objects[0].key).toBe('images/photo1.jpg');
 		});
@@ -226,14 +237,19 @@ describe('ListObjectsOperation', () => {
 			);
 
 			expect(result).toEqual({
-				objects: [],
-				commonPrefixes: [],
+				files: [],
+				folders: [],
 				bucket: 'test-bucket',
 				prefix: '',
 				marker: '',
 				nextMarker: '',
 				maxKeys: 1000,
 				isTruncated: false,
+				totalFiles: 0,
+				totalFolders: 0,
+				// Backward compatibility
+				objects: [],
+				commonPrefixes: [],
 				count: 0
 			});
 		});

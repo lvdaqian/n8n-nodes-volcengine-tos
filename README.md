@@ -109,9 +109,17 @@ This node uses the official `@volcengine/tos-sdk` (v2.7.5) for reliable integrat
 
 ### List Files
 1. Select "List Files" operation
-2. Optionally specify a prefix to filter files
-3. Set maximum number of files to return
-4. The node will return a list of files with metadata
+2. Configure optional parameters:
+   - **Prefix Filter**: Filter files by prefix (e.g., "images/" to list only files in images folder)
+   - **Maximum Number**: Limit the number of files returned (default: 1000)
+   - **Delimiter**: Group files by common prefixes (useful for folder-like structure)
+   - **Marker**: Start listing from a specific file (for pagination)
+3. The node returns an enhanced output format:
+   - `files`: Array of file objects with metadata
+   - `folders`: Array of folder prefixes
+   - `totalFiles`: Count of files returned
+   - `totalFolders`: Count of folder prefixes
+   - Legacy fields (`objects`, `commonPrefixes`) are maintained for backward compatibility
 
 ### Get Pre-Signed URL
 1. Select "Get Pre-Signed URL" operation
