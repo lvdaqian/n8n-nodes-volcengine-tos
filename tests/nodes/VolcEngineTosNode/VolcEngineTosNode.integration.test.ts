@@ -297,12 +297,12 @@ describe('VolcEngineTosNode Integration Tests', () => {
 					// 验证binary数据现在应该在正确的位置
 					expect(downloadData.binary).toBeDefined();
 					if (downloadData.binary && downloadData.binary.data) {
-						expect(downloadData.binary.data).toBeInstanceOf(Buffer);
+						expect(typeof downloadData.binary.data).toBe('string');
 						expect(downloadData.binary.mimeType).toBeDefined();
 						expect(downloadData.binary.fileName).toBeDefined();
 						
-						// 验证下载的内容
-						const downloadedContent = downloadData.binary.data.toString();
+						// 验证下载的内容（从base64解码）
+						const downloadedContent = Buffer.from(downloadData.binary.data as unknown as string, 'base64').toString();
 						expect(downloadedContent).toBe(testContent);
 					}
 					
