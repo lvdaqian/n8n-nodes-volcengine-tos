@@ -131,11 +131,19 @@ describe('GetObjectOperation', () => {
 				credentials
 			);
 
-			expect(result.downloaded).toBe(true);
+			// 验证新的返回格式：包含json和binary字段
+			expect(result.json).toBeDefined();
+			expect(result.json.downloaded).toBe(true);
+			expect(result.json.path).toBe('test-bucket/test-file.txt');
+			expect(result.json.bucket).toBe('test-bucket');
+			expect(result.json.size).toBe(12); // Buffer.from('file content').length
+			expect(result.json.mimeType).toBe('text/plain');
+			expect(result.json.fileName).toBe('test-file.txt');
+			
 			expect(result.binary).toBeDefined();
-			expect(result.binary.data.data).toBe(Buffer.from('file content').toString('base64'));
-			expect(result.binary.data.mimeType).toBe('text/plain');
-			expect(result.binary.data.fileName).toBe('test-file.txt');
+			expect(result.binary.data).toBeInstanceOf(Buffer);
+			expect(result.binary.mimeType).toBe('text/plain');
+			expect(result.binary.fileName).toBe('test-file.txt');
 		});
 
 		it('should throw error for getObject failures', async () => {

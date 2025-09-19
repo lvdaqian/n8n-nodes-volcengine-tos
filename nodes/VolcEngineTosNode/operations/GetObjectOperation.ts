@@ -71,9 +71,20 @@ export class GetObjectOperation extends BaseOperation {
 				buffer = Buffer.from(content as any);
 			}
 
-			result.binary = {
-				data: {
-					data: buffer.toString('base64'),
+			// 为n8n返回正确的格式：json字段包含元数据，binary字段包含二进制数据
+			return {
+				json: {
+					downloaded: true,
+					url: result.url,
+					path: filePath,
+					bucket,
+					size: buffer.length,
+					mimeType: response.headers?.['content-type'] || 'application/octet-stream',
+					fileName: filePath.split('/').pop() || 'downloaded-file',
+					metadata: result.metadata
+				},
+				binary: {
+					data: buffer,
 					mimeType: response.headers?.['content-type'] || 'application/octet-stream',
 					fileName: filePath.split('/').pop() || 'downloaded-file'
 				}

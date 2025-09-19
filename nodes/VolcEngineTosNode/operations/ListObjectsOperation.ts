@@ -47,13 +47,13 @@ export class ListObjectsOperation extends BaseOperation {
 		const response = await client.listObjects(params);
 
 		const objects = response.data?.Contents?.map((obj: any) => ({
-			key: obj.key,
-			size: obj.size,
-			lastModified: obj.lastModified,
-			etag: obj.etag,
-			storageClass: obj.storageClass,
-			owner: obj.owner,
-			url: `https://${bucket}.${credentials.region}.tos-cn-${credentials.region}.bytedance.net/${obj.key}`
+			key: obj.Key || obj.key,
+			size: obj.Size || obj.size,
+			lastModified: obj.LastModified || obj.lastModified,
+			etag: obj.ETag || obj.etag,
+			storageClass: obj.StorageClass || obj.storageClass,
+			owner: obj.Owner || obj.owner,
+			url: `https://${bucket}.${credentials.region}.tos-cn-${credentials.region}.bytedance.net/${obj.Key || obj.key}`
 		})) || [];
 
 		const commonPrefixes = response.data?.CommonPrefixes?.map((cp: any) => cp.Prefix) || [];

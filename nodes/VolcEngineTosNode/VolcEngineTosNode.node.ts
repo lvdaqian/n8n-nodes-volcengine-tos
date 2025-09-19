@@ -301,12 +301,27 @@ export class VolcEngineTosNode implements INodeType {
 					}
 				);
 
-				returnData.push({
-					json: responseData,
-					pairedItem: {
-						item: itemIndex,
-					},
-				});
+				// 检查是否是下载操作返回的特殊格式（包含json和binary字段）
+				if (responseData && typeof responseData === 'object' && 'json' in responseData && 'binary' in responseData) {
+					// 下载操作返回的格式
+					returnData.push({
+						json: responseData.json,
+						binary: {
+							data: responseData.binary
+						},
+						pairedItem: {
+							item: itemIndex,
+						},
+					});
+				} else {
+					// 其他操作的标准格式
+					returnData.push({
+						json: responseData,
+						pairedItem: {
+							item: itemIndex,
+						},
+					});
+				}
 			} catch (error: any) {
 				// Use centralized error handling
 				if (this.continueOnFail()) {
