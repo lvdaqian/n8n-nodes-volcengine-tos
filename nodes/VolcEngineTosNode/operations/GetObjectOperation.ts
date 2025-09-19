@@ -84,9 +84,11 @@ export class GetObjectOperation extends BaseOperation {
 					metadata: result.metadata
 				},
 				binary: {
-					data: buffer.toString('base64'),
-					mimeType: response.headers?.['content-type'] || 'application/octet-stream',
-					fileName: filePath.split('/').pop() || 'downloaded-file'
+					data: {
+						data: buffer.toString('base64'),
+						mimeType: response.headers?.['content-type'] || 'application/octet-stream',
+						fileName: filePath.split('/').pop() || 'downloaded-file'
+					}
 				}
 			};
 		} else {
