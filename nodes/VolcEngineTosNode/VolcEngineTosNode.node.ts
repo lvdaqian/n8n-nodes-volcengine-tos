@@ -139,6 +139,18 @@ export class VolcEngineTosNode implements INodeType {
           description: 'Whether to make the uploaded file publicly accessible',
         },
         {
+          displayName: 'Return Binary Data',
+          name: 'returnBinary',
+          type: 'boolean',
+          displayOptions: {
+            show: {
+              operation: ['downloadFile'],
+            },
+          },
+          default: true,
+          description: 'Whether to return the file content as binary data. If disabled, only metadata will be returned.',
+        },
+        {
           displayName: 'HTTP Method',
           name: 'method',
           type: 'options',
