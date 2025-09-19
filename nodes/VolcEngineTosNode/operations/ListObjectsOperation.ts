@@ -46,15 +46,29 @@ export class ListObjectsOperation extends BaseOperation {
 		// 列出对象
 		const response = await client.listObjects(params);
 
-		const objects = response.data?.Contents?.map((obj: any) => ({
-			key: obj.Key || obj.key,
-			size: obj.Size || obj.size,
-			lastModified: obj.LastModified || obj.lastModified,
-			etag: obj.ETag || obj.etag,
-			storageClass: obj.StorageClass || obj.storageClass,
-			owner: obj.Owner || obj.owner,
-			url: `https://${bucket}.${credentials.region}.tos-cn-${credentials.region}.bytedance.net/${obj.Key || obj.key}`
-		})) || [];
+		const objects = response.data?.Contents?.map((obj: any) => {
+			const key = obj.Key || obj.key;
+			// 构建正确的URL，使用endpoint或默认格式
+			let url: string;
+			if (credentials.endpoint) {
+				// 如果有自定义endpoint，使用它
+				const baseUrl = credentials.endpoint.replace(/\/$/, ''); // 移除末尾斜杠
+				url = `${baseUrl}/${bucket}/${key}`;
+			} else {
+				// 使用默认的TOS URL格式
+				url = `https://${bucket}.${credentials.region}.volces.com/${key}`;
+			}
+			
+			return {
+				key,
+				size: obj.Size || obj.size,
+				lastModified: obj.LastModified || obj.lastModified,
+				etag: obj.ETag || obj.etag,
+				storageClass: obj.StorageClass || obj.storageClass,
+				owner: obj.Owner || obj.owner,
+				url
+			};
+		}) || [];
 
 		const commonPrefixes = response.data?.CommonPrefixes?.map((cp: any) => cp.Prefix) || [];
 

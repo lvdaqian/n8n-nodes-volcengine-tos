@@ -114,7 +114,7 @@ describe('ListObjectsOperation', () => {
 						id: 'owner123',
 						displayName: 'Test Owner'
 					},
-					url: 'https://test-bucket.cn-north-1.tos-cn-cn-north-1.bytedance.net/folder/file1.txt'
+					url: 'https://tos-s3-cn-north-1.volces.com/test-bucket/folder/file1.txt'
 				},
 				{
 					key: 'folder/file2.txt',
@@ -126,7 +126,7 @@ describe('ListObjectsOperation', () => {
 						id: 'owner456',
 						displayName: 'Test Owner 2'
 					},
-					url: 'https://test-bucket.cn-north-1.tos-cn-cn-north-1.bytedance.net/folder/file2.txt'
+					url: 'https://tos-s3-cn-north-1.volces.com/test-bucket/folder/file2.txt'
 				}
 			];
 			const expectedFolders = ['images/', 'documents/'];

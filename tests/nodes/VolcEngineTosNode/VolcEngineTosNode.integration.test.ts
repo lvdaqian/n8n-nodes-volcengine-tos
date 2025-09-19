@@ -297,12 +297,12 @@ describe('VolcEngineTosNode Integration Tests', () => {
 					// 验证binary数据现在应该在正确的位置
 					expect(downloadData.binary).toBeDefined();
 					if (downloadData.binary && downloadData.binary.data) {
-						expect(downloadData.binary.data.data).toBeInstanceOf(Buffer);
-						expect(downloadData.binary.data.mimeType).toBeDefined();
-						expect(downloadData.binary.data.fileName).toBeDefined();
+						expect(downloadData.binary.data).toBeInstanceOf(Buffer);
+						expect(downloadData.binary.mimeType).toBeDefined();
+						expect(downloadData.binary.fileName).toBeDefined();
 						
 						// 验证下载的内容
-						const downloadedContent = downloadData.binary.data.data.toString();
+						const downloadedContent = downloadData.binary.data.toString();
 						expect(downloadedContent).toBe(testContent);
 					}
 					

@@ -306,9 +306,7 @@ export class VolcEngineTosNode implements INodeType {
 					// 下载操作返回的格式
 					returnData.push({
 						json: responseData.json,
-						binary: {
-							data: responseData.binary
-						},
+						binary: responseData.binary,
 						pairedItem: {
 							item: itemIndex,
 						},
