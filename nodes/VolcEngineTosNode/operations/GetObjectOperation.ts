@@ -35,10 +35,27 @@ export class GetObjectOperation extends BaseOperation {
 		}
 
 		// 获取对象
-		const response = await client.getObject({
-			bucket: bucket,
-			key: filePath,
-		});
+		let response: any;
+		try {
+			response = await client.getObject({
+				bucket: bucket,
+				key: filePath,
+			});
+			
+			if (!response || !response.data) {
+				throw new Error(`文件下载失败：未获取到文件内容 - ${filePath}`);
+			}
+		} catch (error: any) {
+			if (error.code === 'NoSuchKey') {
+				throw new Error(`文件不存在：${filePath}`);
+			} else if (error.code === 'AccessDenied') {
+				throw new Error(`访问被拒绝：没有权限访问文件 ${filePath}`);
+			} else if (error.code === 'NoSuchBucket') {
+				throw new Error(`存储桶不存在：${bucket}`);
+			} else {
+				throw new Error(`下载文件失败：${error.message || error.toString()} - 文件路径：${filePath}`);
+			}
+		}
 
 		const fileUrl = await super.generatePreSignedUrl(client, bucket, filePath, 'GET', 3600);
 
